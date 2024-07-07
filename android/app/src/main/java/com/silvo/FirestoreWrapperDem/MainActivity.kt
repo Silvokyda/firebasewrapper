@@ -1,4 +1,4 @@
-package com.silvo.FirestoreWrapperDemo
+package com.silvo.FirestoreWrapperDem
 
 import android.os.Build
 import android.os.Bundle

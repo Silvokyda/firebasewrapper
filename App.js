@@ -1,61 +1,52 @@
-import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
-import firestore from './firestoreWrapper'; 
+import React, { useEffect, useState } from 'react';
+import { View, Text } from 'react-native';
+import { initializeApp, getApps } from '@react-native-firebase/app'; 
+import SampleComponent from './SampleComponent';
 
-export default function App() {
-  const [asyncLog, setAsyncLog] = useState('');
-  const [nonAsyncLog, setNonAsyncLog] = useState('');
+const firebaseConfig = {
+  apiKey: "AIzaSyCTDTDVKuIpz5ojHJI7fVUwA-UTCBS7ktU",
+  authDomain: "al-salam-af8a5.firebaseapp.com",
+  projectId: "al-salam-af8a5",
+  storageBucket: "al-salam-af8a5.appspot.com",
+  messagingSenderId: "87213785550",
+  appId: "1:87213785550:web:8679a504db714288752b9f",
+  measurementId: "G-4GN309G6DY",
+};
 
-  const handleAsyncRequest = async () => {
-    try {
-      const startTime = Date.now();
-      const doc = await firestore().collection('testCollection').doc('testDoc').get();
-      const endTime = Date.now();
-      const log = `Async request took ${endTime - startTime} ms`;
-      console.log('Document data:', doc.data());
-      setAsyncLog(log);
-    } catch (error) {
-      console.error('Error fetching document:', error);
-    }
-  };
+const App = () => {
+  const [firebaseInitialized, setFirebaseInitialized] = useState(false);
 
-  const handleNonAsyncRequest = () => {
-    const startTime = Date.now();
-    const collectionRef = firestore().collection('testCollection');
-    const endTime = Date.now();
-    const log = `Non-async request took ${endTime - startTime} ms`;
-    console.log('Collection ref:', collectionRef);
-    setNonAsyncLog(log);
-  };
+  useEffect(() => {
+    const initializeFirebase = async () => {
+      console.log('Initializing Firebase...');
+      try {
+        if (!getApps().length) {
+          await initializeApp(firebaseConfig);
+          console.log('Firebase initialized successfully!');
+        }
+        setFirebaseInitialized(true); 
+      } catch (error) {
+        console.error('Error initializing Firebase:', error);
+      }
+    };
+
+    initializeFirebase();
+  }, []);
+  
+
+  if (!firebaseInitialized) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading Firebase...</Text>
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Firestore Wrapper Example</Text>
-      <View style={styles.buttonContainer}>
-        <Button title="Async Request" onPress={handleAsyncRequest} />
-        <Text>{asyncLog}</Text>
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button title="Non-Async Request" onPress={handleNonAsyncRequest} />
-        <Text>{nonAsyncLog}</Text>
-      </View>
+    <View style={{ flex: 1 }}>
+      <SampleComponent />
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    marginVertical: 10,
-  },
-});
+export default App;

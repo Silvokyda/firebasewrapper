@@ -15,15 +15,20 @@
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.silvo.FirestoreWrapperDemo"
+      "package": "com.silvo.FirestoreWrapperDem"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth"
+    ],
     "extra": {
       "eas": {
         "projectId": "4d8544f5-eda2-46fe-bc4b-e33c50224937"

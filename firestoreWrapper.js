@@ -1,32 +1,26 @@
-import firestore from "@react-native-firebase/firestore";
+import firestore from '@react-native-firebase/firestore';
 
-function createAsyncLoggingWrapper() {
-  return new Proxy(firestore, {
-    get(target, property, receiver) {
-      const originalProperty = target[property];
+const firestoreWrapper = new Proxy(firestore, {
+  get(target, propKey) {
+    const originalValue = target[propKey];
 
-      if (typeof originalProperty === 'function') {
-        return function (...args) {
-          const result = originalProperty.apply(this, args);
+    if (typeof originalValue === 'function') {
+      return async function (...args) {
+        const startTime = Date.now();
 
-          if (result instanceof Promise) {
-            const startTime = Date.now();
+        const result = await originalValue.apply(target, args);
+        
+        const endTime = Date.now();
+        const elapsedTimeMs = endTime - startTime;
 
-            return result.finally(() => {
-              const endTime = Date.now();
-              console.log(`Async request to ${property} took ${endTime - startTime} ms`);
-            });
-          }
+        console.log(`Firestore async call (${propKey}) took ${elapsedTimeMs} ms`);
 
-          return result;
-        };
-      }
+        return result; 
+      };
+    }
 
-      return originalProperty;
-    },
-  });
-}
-
-const firestoreWrapper = createAsyncLoggingWrapper();
+    return originalValue; 
+  }
+});
 
 export default firestoreWrapper;
